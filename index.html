@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>Simulare Cântar cu Arc</title>
+<style>
+    body {
+        font-family: Arial;
+        background: #eef2f7;
+        text-align: center;
+        padding: 30px;
+    }
+
+    #spring-container {
+        position: relative;
+        height: 350px;
+        margin: 40px auto;
+        width: 100px;
+    }
+
+    /* Resort spiralat */
+    #spring {
+        width: 10px;
+        height: 120px;
+        margin: 0 auto;
+        background: repeating-linear-gradient(
+            to bottom,
+            #444 0px,
+            #444 6px,
+            #bbb 6px,
+            #bbb 12px
+        );
+        border-radius: 5px;
+        transition: height 0.3s ease-out;
+    }
+
+    /* Greutatea */
+    #weight {
+        width: 60px;
+        height: 40px;
+        background: #444;
+        color: white;
+        line-height: 40px;
+        border-radius: 5px;
+        margin: 0 auto;
+        transform: translateY(0px);
+    }
+
+    /* animație elastică */
+    .elastic {
+        transition: transform 0.6s cubic-bezier(.28,1.25,.56,1.14);
+    }
+
+    table {
+        margin: 30px auto;
+        border-collapse: collapse;
+        width: 60%;
+        background: white;
+    }
+
+    table, td, th {
+        border: 1px solid #555;
+        padding: 8px;
+    }
+
+    th {
+        background: #ddd;
+    }
+</style>
+</head>
+<body>
+
+<h1>Simularea unui cântar cu arc</h1>
+
+<input id="masaInput" type="number" placeholder="Introduceți masa (g)">
+<button onclick="simuleaza()">Calculează</button>
+
+<div id="spring-container">
+    <div id="spring"></div>
+    <div id="weight">0 g</div>
+</div>
+
+<h2>Rezultate</h2>
+<div id="results"></div>
+
+<h2>Date salvate</h2>
+<table id="table">
+    <tr>
+        <th>Masa (g)</th>
+        <th>Forța (N)</th>
+        <th>Alungirea (cm)</th>
+        <th>k (N/m)</th>
+    </tr>
+</table>
+
+<script>
+let k = 12;  // pune aici constanta ta reală
+
+function simuleaza() {
+    const g = 9.81;
+    const masa_g = Number(document.getElementById("masaInput").value);
+    const masa_kg = masa_g / 1000;
+
+    const F = masa_kg * g;
+    const x = F / k;  // în metri
+    const xPix = x * 120; // factor pentru animație
+
+    const spring = document.getElementById("spring");
+    const weight = document.getElementById("weight");
+
+    // animație elastică
+    weight.classList.add("elastic");
+    weight.style.transform = `translateY(${xPix}px)`;
+    spring.style.height = (120 + xPix) + "px";
+    weight.innerText = masa_g + " g";
+
+    document.getElementById("results").innerHTML = `
+        Forța: <b>${F.toFixed(3)} N</b><br>
+        Alungirea: <b>${(x * 100).toFixed(2)} cm</b><br>
+        Constanta k: <b>${k} N/m</b>
+    `;
+
+    // Salvare date în tabel
+    let table = document.getElementById("table");
+    let row = table.insertRow(-1);
+    row.insertCell(0).innerText = masa_g;
+    row.insertCell(1).innerText = F.toFixed(3);
+    row.insertCell(2).innerText = (x*100).toFixed(2);
+    row.insertCell(3).innerText = k;
+}
+</script>
+
+</body>
+</html>
