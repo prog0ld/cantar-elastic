@@ -3,7 +3,7 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <title>Laborator Fizică - Popa</title>
+    <title>Fizică</title>
     <style>
         body {
             font-family: 'Courier New', Courier, monospace;
@@ -16,14 +16,13 @@
 
         header {
             background: #222;
-            color: #00ff00; /* Verde tip consola */
+            color: #ffffff; 
             padding: 15px;
             text-align: center;
             border-bottom: 2px solid #444;
             font-weight: bold;
         }
 
-        /* Containerul pentru cele doua coloane de input/simulare */
         .simulation-container {
             display: flex;
             flex-direction: row;
@@ -61,7 +60,7 @@
             font-family: inherit;
         }
 
-        /* Zona de desenat resortul */
+        /* Zona resort */
         .spring-area {
             height: 300px;
             position: relative;
@@ -91,7 +90,7 @@
             font-size: 11px;
         }
 
-        /* Sectiunea de tabele (mutata jos) */
+        /* Sectiuna de tabel */
         .results-container {
             display: flex;
             flex-direction: row;
@@ -128,13 +127,13 @@
 <body>
 
 <header>
-    SISTEM MASURARE LEGEA LUI HOOKE - v1.0
+    PROIECT LEGEA LUI HOOKE
 </header>
 
 <div class="simulation-container">
     <div class="column">
         <div class="panel">
-            <h2>[MOD 1] Calcul constantă k</h2>
+            <h2>Calcul constantă k</h2>
             Masa(g): <input type="number" id="m1" value="200"> 
             &Delta;l(cm): <input type="number" id="dl1" value="10">
             <button onclick="runMod1()">CALCULEAZĂ</button>
@@ -150,7 +149,7 @@
 
     <div class="column">
         <div class="panel">
-            <h2>[MOD 2] Calcul alungire &Delta;l</h2>
+            <h2>Calcul alungire &Delta;l;&Delt;</h2>
             k(N/m): <input type="number" id="k2" value="50"> 
             Masa(g): <input type="number" id="m2" value="300">
             <button onclick="runMod2()">SIMULEAZĂ</button>
@@ -183,13 +182,13 @@
 </div>
 
 <footer>
-    * proiect realizat de Popa | Liceu Mate-Info | 2024 *
+    * proiect realizat pentru lucrarea dr laborator | 2026 *
 </footer>
 
 <script>
     const g = 9.81;
 
-    // Functie de desenat resortul "brut" (zig-zag)
+    // Funct resortul "brut"
     function drawSpring(pathId, height) {
         let h = parseFloat(height);
         if (h > 280) h = 280; // limita vizuala sa nu iasa din cutie
@@ -218,7 +217,7 @@
         let k = ( (m/1000) * g ) / (dl/100);
         document.getElementById('outK').innerText = k.toFixed(2);
         
-        let vHeight = 80 + (dl * 3); // factor de scalare vizuala
+        let vHeight = 80 + (dl * 3); 
         drawSpring('path1', vHeight);
         document.getElementById('w1').style.top = vHeight + "px";
         document.getElementById('w1').innerText = m + "g";
