@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -5,240 +6,255 @@
     <title>Laborator Fizică - Popa</title>
     <style>
         body {
-            font-family: 'Courier New', Courier, monospace; /* Stil de programator */
+            font-family: 'Courier New', Courier, monospace;
             margin: 0;
-            background-color: #f0f0f0;
+            background-color: #f4f4f4;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
 
         header {
-            background: #333;
-            color: white;
-            padding: 10px;
+            background: #222;
+            color: #00ff00; /* Verde tip consola */
+            padding: 15px;
             text-align: center;
-            border-bottom: 4px solid #555;
+            border-bottom: 2px solid #444;
+            font-weight: bold;
         }
 
-        .main-container {
+        /* Containerul pentru cele doua coloane de input/simulare */
+        .simulation-container {
             display: flex;
-            flex: 1;
-            overflow: hidden;
+            flex-direction: row;
+            border-bottom: 2px solid #333;
+            background: white;
         }
 
-        /* Cele doua coloane 50/50 */
         .column {
             flex: 1;
             padding: 20px;
+            border-right: 1px solid #ccc;
             display: flex;
             flex-direction: column;
-            border-right: 2px dashed #999;
-            overflow-y: auto;
         }
 
         .column:last-child { border-right: none; }
 
         .panel {
-            background: white;
-            border: 2px solid #333;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 5px 5px 0px #999;
+            border: 1px solid #000;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #fafafa;
         }
 
-        h2 { margin-top: 0; font-size: 1.2em; text-decoration: underline; }
+        h2 { font-size: 1.1em; margin-top: 0; background: #eee; padding: 5px; }
 
-        input {
-            width: 80px;
-            padding: 5px;
-            margin: 5px;
-            border: 1px solid #333;
-        }
+        input { width: 70px; margin: 5px; font-family: inherit; }
 
         button {
-            padding: 8px 15px;
-            background: #333;
-            color: white;
-            border: none;
             cursor: pointer;
+            background: #444;
+            color: white;
+            border: 1px solid #000;
+            padding: 5px 10px;
             font-family: inherit;
         }
 
-        button:hover { background: #555; }
-
-        /* Resortul "Nefinisat" - Stil desenat */
-        .spring-box {
-            height: 200px;
+        /* Zona de desenat resortul */
+        .spring-area {
+            height: 300px;
+            position: relative;
+            background: #fff;
+            border: 1px inset #eee;
+            overflow: hidden;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            background: #fff;
-            border: 1px solid #ddd;
-            margin-top: 10px;
-            position: relative;
         }
 
         .spring-svg {
-            stroke: black;
+            stroke: #333;
             stroke-width: 2;
             fill: none;
-            transition: height 0.5s ease;
         }
 
-        .weight-box {
-            width: 40px;
+        .weight {
+            width: 50px;
             height: 40px;
-            border: 2px solid black;
-            background: #bbb;
+            border: 2px solid #000;
+            background: #888;
+            color: white;
+            position: absolute;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            position: absolute;
+            font-size: 11px;
+        }
+
+        /* Sectiunea de tabele (mutata jos) */
+        .results-container {
+            display: flex;
+            flex-direction: row;
+            padding: 20px;
+            gap: 20px;
+            background: #eee;
+        }
+
+        .table-wrapper {
+            flex: 1;
+            background: white;
+            padding: 10px;
+            border: 1px solid #333;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8em;
-            margin-top: 10px;
+            font-size: 0.85em;
         }
 
-        th, td { border: 1px solid #333; padding: 5px; text-align: center; }
-        th { background: #eee; }
+        th, td { border: 1px solid #000; padding: 4px; text-align: center; }
+        th { background: #ddd; }
 
         footer {
-            background: #333;
-            color: #aaa;
             text-align: center;
-            padding: 5px;
-            font-size: 0.8em;
+            padding: 10px;
+            background: #222;
+            color: #777;
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
 
 <header>
-    PROIECT FIZICĂ - LEGEA LUI HOOKE
+    SISTEM MASURARE LEGEA LUI HOOKE - v1.0
 </header>
 
-<div class="main-container">
+<div class="simulation-container">
     <div class="column">
         <div class="panel">
-            <h2>1. Calcul k (Experiment)</h2>
-            <label>Masa (g):</label> <input type="number" id="m1" value="200"><br>
-            <label>Delta L (cm):</label> <input type="number" id="dl1" value="5"><br>
-            <button onclick="calcK()">Execută Calcul</button>
-            <p>Rezultat k: <b id="resK">?</b> N/m</p>
+            <h2>[MOD 1] Calcul constantă k</h2>
+            Masa(g): <input type="number" id="m1" value="200"> 
+            &Delta;l(cm): <input type="number" id="dl1" value="10">
+            <button onclick="runMod1()">CALCULEAZĂ</button>
+            <p>Rezultat: <b>k = <span id="outK">?</span> N/m</b></p>
         </div>
-
-        <div class="spring-box">
-            <svg class="spring-svg" id="svg1" width="40" height="100">
-                <path id="path1" d="M20,0 L20,10 L10,20 L30,30 L10,40 L30,50 L10,60 L30,70 L20,80 L20,100" />
+        <div class="spring-area">
+            <svg class="spring-svg" id="svg1" width="60" height="100">
+                <path id="path1" d="" />
             </svg>
-            <div id="w1" class="weight-box" style="top: 100px;">m</div>
+            <div id="w1" class="weight">m</div>
         </div>
-
-        <table>
-            <thead><tr><th>m(g)</th><th>dL(cm)</th><th>k(N/m)</th></tr></thead>
-            <tbody id="tab1"></tbody>
-        </table>
     </div>
 
     <div class="column">
         <div class="panel">
-            <h2>2. Calcul Delta L (Predicție)</h2>
-            <label>Masa (g):</label> <input type="number" id="m2" value="500"><br>
-            <label>Const. k (N/m):</label> <input type="number" id="k2" value="50"><br>
-            <button onclick="calcDL()">Simulează</button>
-            <p>Alungire: <b id="resDL">?</b> cm</p>
+            <h2>[MOD 2] Calcul alungire &Delta;l</h2>
+            k(N/m): <input type="number" id="k2" value="50"> 
+            Masa(g): <input type="number" id="m2" value="300">
+            <button onclick="runMod2()">SIMULEAZĂ</button>
+            <p>Rezultat: <b>&Delta;l = <span id="outDL">?</span> cm</b></p>
         </div>
-
-        <div class="spring-box">
-            <svg class="spring-svg" id="svg2" width="40" height="100">
-                <path id="path2" d="M20,0 L20,10 L10,20 L30,30 L10,40 L30,50 L10,60 L30,70 L20,80 L20,100" />
+        <div class="spring-area">
+            <svg class="spring-svg" id="svg2" width="60" height="100">
+                <path id="path2" d="" />
             </svg>
-            <div id="w2" class="weight-box" style="top: 100px;">m</div>
+            <div id="w2" class="weight">m</div>
         </div>
+    </div>
+</div>
 
+<div class="results-container">
+    <div class="table-wrapper">
+        <caption>Istoric Mod 1</caption>
         <table>
-            <thead><tr><th>k(N/m)</th><th>m(g)</th><th>dL(cm)</th></tr></thead>
+            <thead><tr><th>m (g)</th><th>&Delta;l (cm)</th><th>k (N/m)</th></tr></thead>
+            <tbody id="tab1"></tbody>
+        </table>
+    </div>
+    <div class="table-wrapper">
+        <caption>Istoric Mod 2</caption>
+        <table>
+            <thead><tr><th>k (N/m)</th><th>m (g)</th><th>&Delta;l (cm)</th></tr></thead>
             <tbody id="tab2"></tbody>
         </table>
     </div>
 </div>
 
 <footer>
-    * făcut de Popa | Clasa a IX-a Mate-Info | 2024
+    * proiect realizat de Popa | Liceu Mate-Info | 2024 *
 </footer>
 
 <script>
-    const G = 9.81;
+    const g = 9.81;
 
-    // Funcție pentru a desena resortul în zig-zag variabil
+    // Functie de desenat resortul "brut" (zig-zag)
     function drawSpring(pathId, height) {
-        const h = parseFloat(height);
-        const steps = 7;
-        const stepHeight = (h - 30) / steps;
-        let d = `M20,0 L20,10`; // Capăt sus
-        for(let i=0; i<steps; i++) {
-            let x = (i % 2 === 0) ? 10 : 30;
-            d += ` L${x},${20 + (i * stepHeight)}`;
+        let h = parseFloat(height);
+        if (h > 280) h = 280; // limita vizuala sa nu iasa din cutie
+        const topY = 0;
+        const loops = 8;
+        const loopHeight = (h - 20) / loops;
+        
+        let d = `M30,${topY} L30,10`;
+        for (let i = 0; i < loops; i++) {
+            let x = (i % 2 === 0) ? 15 : 45;
+            let y = 10 + (i * loopHeight) + (loopHeight / 2);
+            d += ` L${x},${y}`;
         }
-        d += ` L20,${h-10} L20,${h}`; // Capăt jos
-        document.getElementById(pathId).setAttribute('d', d);
-        document.getElementById(pathId).parentElement.setAttribute('height', h);
+        d += ` L30,${h-10} L30,${h}`;
+        
+        const path = document.getElementById(pathId);
+        path.setAttribute('d', d);
+        path.parentElement.setAttribute('height', h);
     }
 
-    function calcK() {
+    function runMod1() {
         let m = document.getElementById('m1').value;
         let dl = document.getElementById('dl1').value;
         if(m <= 0 || dl <= 0) return;
 
-        let k = ( (m/1000) * G ) / (dl/100);
-        document.getElementById('resK').innerText = k.toFixed(2);
+        let k = ( (m/1000) * g ) / (dl/100);
+        document.getElementById('outK').innerText = k.toFixed(2);
         
-        // Animatie resort
-        let visualH = 100 + (dl * 2); 
-        drawSpring('path1', visualH);
-        document.getElementById('w1').style.top = visualH + "px";
+        let vHeight = 80 + (dl * 3); // factor de scalare vizuala
+        drawSpring('path1', vHeight);
+        document.getElementById('w1').style.top = vHeight + "px";
         document.getElementById('w1').innerText = m + "g";
 
-        updateTable('tab1', [m, dl, k.toFixed(2)]);
+        addTableRow('tab1', [m, dl, k.toFixed(2)]);
     }
 
-    function calcDL() {
-        let m = document.getElementById('m2').value;
+    function runMod2() {
         let k = document.getElementById('k2').value;
-        if(m <= 0 || k <= 0) return;
+        let m = document.getElementById('m2').value;
+        if(k <= 0 || m <= 0) return;
 
-        let dlMetri = ( (m/1000) * G ) / k;
-        let dlCm = dlMetri * 100;
-        document.getElementById('resDL').innerText = dlCm.toFixed(2);
+        let dlM = ( (m/1000) * g ) / k;
+        let dlCm = dlM * 100;
+        document.getElementById('outDL').innerText = dlCm.toFixed(2);
 
-        // Animatie resort
-        let visualH = 100 + (dlCm * 2);
-        drawSpring('path2', visualH);
-        document.getElementById('w2').style.top = visualH + "px";
+        let vHeight = 80 + (dlCm * 3);
+        drawSpring('path2', vHeight);
+        document.getElementById('w2').style.top = vHeight + "px";
         document.getElementById('w2').innerText = m + "g";
 
-        updateTable('tab2', [k, m, dlCm.toFixed(2)]);
+        addTableRow('tab2', [k, m, dlCm.toFixed(2)]);
     }
 
-    function updateTable(id, data) {
-        let table = document.getElementById(id);
-        let row = table.insertRow(0);
-        data.forEach(text => {
-            let cell = row.insertCell();
-            cell.innerText = text;
-        });
-        if(table.rows.length > 10) table.deleteRow(10);
+    function addTableRow(id, values) {
+        let tbody = document.getElementById(id);
+        let row = tbody.insertRow(0);
+        values.forEach(v => row.insertCell().innerText = v);
+        if(tbody.rows.length > 10) tbody.deleteRow(10);
     }
 
-    // Initializare
-    drawSpring('path1', 100);
-    drawSpring('path2', 100);
+    // Init la incarcare
+    window.onload = () => {
+        drawSpring('path1', 80);
+        drawSpring('path2', 80);
+    };
 </script>
 
 </body>
