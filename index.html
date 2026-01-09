@@ -2,271 +2,245 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulare Resort - Legea lui Hooke</title>
+    <title>Laborator Fizică - Popa</title>
     <style>
-        :root {
-            --primary-color: #3498db;
-            --spring-color: #555;
-            --weight-color: #e74c3c;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: 'Courier New', Courier, monospace; /* Stil de programator */
+            margin: 0;
+            background-color: #f0f0f0;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin: 0;
-            padding: 20px;
+            height: 100vh;
         }
 
-        h1 {
-            color: #2c3e50;
-        }
-
-        /* Container principal */
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 40px;
-            justify-content: center;
-            max-width: 1000px;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        /* Zona de control si tabel */
-        .controls-panel {
-            flex: 1;
-            min-width: 300px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        input[type="number"] {
+        header {
+            background: #333;
+            color: white;
             padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            width: 120px;
-            font-size: 16px;
+            text-align: center;
+            border-bottom: 4px solid #555;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Cele doua coloane 50/50 */
+        .column {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px dashed #999;
+            overflow-y: auto;
+        }
+
+        .column:last-child { border-right: none; }
+
+        .panel {
+            background: white;
+            border: 2px solid #333;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 5px 5px 0px #999;
+        }
+
+        h2 { margin-top: 0; font-size: 1.2em; text-decoration: underline; }
+
+        input {
+            width: 80px;
+            padding: 5px;
+            margin: 5px;
+            border: 1px solid #333;
         }
 
         button {
-            padding: 10px 20px;
-            background-color: var(--primary-color);
+            padding: 8px 15px;
+            background: #333;
             color: white;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
+            font-family: inherit;
         }
 
-        button:hover {
-            background-color: #2980b9;
-        }
+        button:hover { background: #555; }
 
-        /* Zona de simulare vizuala */
-        .simulation-area {
-            flex: 1;
-            min-width: 300px;
-            height: 500px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
+        /* Resortul "Nefinisat" - Stil desenat */
+        .spring-box {
+            height: 200px;
             display: flex;
             justify-content: center;
-            overflow: hidden; /* Ascunde daca iese din cadru */
-            border-top: 10px solid #333; /* Tavanul */
-        }
-
-        /* Resortul vizual */
-        #spring-visual {
-            width: 40px;
-            height: 100px; /* Lungimea initiala */
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 5px,
-                var(--spring-color) 5px,
-                var(--spring-color) 10px
-            );
-            border-left: 2px solid var(--spring-color);
-            border-right: 2px solid var(--spring-color);
-            transform-origin: top center;
-            transition: height 1s cubic-bezier(0.5, 0, 0.5, 1.2); /* Efect de elasticitate */
+            align-items: flex-start;
+            background: #fff;
+            border: 1px solid #ddd;
+            margin-top: 10px;
             position: relative;
-            z-index: 1;
         }
 
-        /* Greutatea atarnata */
-        #weight-visual {
-            width: 60px;
-            height: 60px;
-            background-color: var(--weight-color);
-            border-radius: 5px;
-            position: absolute;
-            bottom: -60px; /* Sub resort */
-            left: -10px;
+        .spring-svg {
+            stroke: black;
+            stroke-width: 2;
+            fill: none;
+            transition: height 0.5s ease;
+        }
+
+        .weight-box {
+            width: 40px;
+            height: 40px;
+            border: 2px solid black;
+            background: #bbb;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            box-shadow: 0 4px 4px rgba(0,0,0,0.2);
-            transition: opacity 0.3s;
-            opacity: 0; /* Invizibil initial */
+            font-size: 10px;
+            position: absolute;
         }
 
-        /* Tabelul de date */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            font-size: 0.8em;
+            margin-top: 10px;
         }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        th, td { border: 1px solid #333; padding: 5px; text-align: center; }
+        th { background: #eee; }
+
+        footer {
+            background: #333;
+            color: #aaa;
             text-align: center;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            color: #333;
-        }
-
-        .stats-box {
-            background: #eef7fb;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 5px solid var(--primary-color);
-            margin-bottom: 20px;
+            padding: 5px;
+            font-size: 0.8em;
         }
     </style>
 </head>
 <body>
 
-    <h1>🧪 Demonstrator Legea lui Hooke</h1>
-    <p>Constanta elastică a resortului (k) este fixată la <strong>50 N/m</strong>.</p>
+<header>
+    PROIECT FIZICĂ - LEGEA LUI HOOKE
+</header>
 
-    <div class="container">
-        <div class="controls-panel">
-            <div class="input-group">
-                <label for="massInput">Masă (grame): </label>
-                <input type="number" id="massInput" placeholder="ex: 500" min="0">
-                <button onclick="addWeight()">Adaugă Greutate</button>
-            </div>
-
-            <div class="stats-box">
-                <div><strong>Forța (G):</strong> <span id="display-force">0</span> N</div>
-                <div><strong>Extensia (&Delta;l):</strong> <span id="display-extension">0</span> m</div>
-            </div>
-
-            <h3>Istoric Măsurători (Max 10)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Masă (g)</th>
-                        <th>Forță (N)</th>
-                        <th>&Delta;l (m)</th>
-                    </tr>
-                </thead>
-                <tbody id="history-table">
-                    </tbody>
-            </table>
+<div class="main-container">
+    <div class="column">
+        <div class="panel">
+            <h2>1. Calcul k (Experiment)</h2>
+            <label>Masa (g):</label> <input type="number" id="m1" value="200"><br>
+            <label>Delta L (cm):</label> <input type="number" id="dl1" value="5"><br>
+            <button onclick="calcK()">Execută Calcul</button>
+            <p>Rezultat k: <b id="resK">?</b> N/m</p>
         </div>
 
-        <div class="simulation-area">
-            <div id="spring-visual">
-                <div id="weight-visual">0g</div>
-            </div>
-            
-            <div style="position: absolute; left: 10px; top: 0; bottom: 0; width: 1px; background: #ccc;"></div>
-            <div style="position: absolute; left: 10px; top: 100px; width: 10px; height: 1px; background: #333;"></div>
-            <div style="position: absolute; left: 25px; top: 90px; font-size: 12px; color: #666;">Poz. inițială</div>
+        <div class="spring-box">
+            <svg class="spring-svg" id="svg1" width="40" height="100">
+                <path id="path1" d="M20,0 L20,10 L10,20 L30,30 L10,40 L30,50 L10,60 L30,70 L20,80 L20,100" />
+            </svg>
+            <div id="w1" class="weight-box" style="top: 100px;">m</div>
         </div>
+
+        <table>
+            <thead><tr><th>m(g)</th><th>dL(cm)</th><th>k(N/m)</th></tr></thead>
+            <tbody id="tab1"></tbody>
+        </table>
     </div>
 
-    <script>
-        // Constante fizice
-        const GRAVITY = 9.81; // m/s^2
-        const K_CONSTANT = 50; // N/m (Constanta resortului aleasă arbitrar pentru demo)
-        const PIXELS_PER_METER = 1000; // Factor de scalare pentru vizualizare (1m = 1000px)
-        const INITIAL_LENGTH_PX = 100; // Lungimea resortului nedeformat in pixeli
+    <div class="column">
+        <div class="panel">
+            <h2>2. Calcul Delta L (Predicție)</h2>
+            <label>Masa (g):</label> <input type="number" id="m2" value="500"><br>
+            <label>Const. k (N/m):</label> <input type="number" id="k2" value="50"><br>
+            <button onclick="calcDL()">Simulează</button>
+            <p>Alungire: <b id="resDL">?</b> cm</p>
+        </div>
 
-        let measurementCount = 0;
+        <div class="spring-box">
+            <svg class="spring-svg" id="svg2" width="40" height="100">
+                <path id="path2" d="M20,0 L20,10 L10,20 L30,30 L10,40 L30,50 L10,60 L30,70 L20,80 L20,100" />
+            </svg>
+            <div id="w2" class="weight-box" style="top: 100px;">m</div>
+        </div>
 
-        function addWeight() {
-            // 1. Preluare input
-            const massInput = document.getElementById('massInput');
-            const massGrams = parseFloat(massInput.value);
+        <table>
+            <thead><tr><th>k(N/m)</th><th>m(g)</th><th>dL(cm)</th></tr></thead>
+            <tbody id="tab2"></tbody>
+        </table>
+    </div>
+</div>
 
-            // Validare simplă
-            if (isNaN(massGrams) || massGrams < 0) {
-                alert("Te rog introdu o greutate validă (pozitivă) în grame.");
-                return;
-            }
+<footer>
+    * făcut de Popa | Clasa a IX-a Mate-Info | 2024
+</footer>
 
-            // 2. Calcule Fizice
-            const massKg = massGrams / 1000;
-            const force = massKg * GRAVITY; // F = m * g
-            const deltaL = force / K_CONSTANT; // Legea lui Hooke: deltaL = F / k
+<script>
+    const G = 9.81;
 
-            // 3. Actualizare Vizuală (Animatie)
-            const springEl = document.getElementById('spring-visual');
-            const weightEl = document.getElementById('weight-visual');
-            
-            // Calculăm noua înălțime în pixeli
-            // Adăugăm extensia la lungimea de bază
-            const extensionPx = deltaL * PIXELS_PER_METER;
-            const newHeight = INITIAL_LENGTH_PX + extensionPx;
-
-            // Aplicăm stilurile
-            springEl.style.height = `${newHeight}px`;
-            
-            weightEl.style.opacity = '1';
-            weightEl.innerText = `${massGrams}g`;
-
-            // 4. Actualizare Text Rezultate
-            document.getElementById('display-force').innerText = force.toFixed(3);
-            document.getElementById('display-extension').innerText = deltaL.toFixed(3);
-
-            // 5. Adăugare în Tabel
-            updateTable(massGrams, force, deltaL);
+    // Funcție pentru a desena resortul în zig-zag variabil
+    function drawSpring(pathId, height) {
+        const h = parseFloat(height);
+        const steps = 7;
+        const stepHeight = (h - 30) / steps;
+        let d = `M20,0 L20,10`; // Capăt sus
+        for(let i=0; i<steps; i++) {
+            let x = (i % 2 === 0) ? 10 : 30;
+            d += ` L${x},${20 + (i * stepHeight)}`;
         }
+        d += ` L20,${h-10} L20,${h}`; // Capăt jos
+        document.getElementById(pathId).setAttribute('d', d);
+        document.getElementById(pathId).parentElement.setAttribute('height', h);
+    }
 
-        function updateTable(mass, force, deltaL) {
-            const tbody = document.getElementById('history-table');
-            measurementCount++;
+    function calcK() {
+        let m = document.getElementById('m1').value;
+        let dl = document.getElementById('dl1').value;
+        if(m <= 0 || dl <= 0) return;
 
-            // Creare rând nou
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${measurementCount}</td>
-                <td>${mass}</td>
-                <td>${force.toFixed(3)}</td>
-                <td>${deltaL.toFixed(3)}</td>
-            `;
+        let k = ( (m/1000) * G ) / (dl/100);
+        document.getElementById('resK').innerText = k.toFixed(2);
+        
+        // Animatie resort
+        let visualH = 100 + (dl * 2); 
+        drawSpring('path1', visualH);
+        document.getElementById('w1').style.top = visualH + "px";
+        document.getElementById('w1').innerText = m + "g";
 
-            // Adaugă la începutul tabelului
-            tbody.insertBefore(row, tbody.firstChild);
+        updateTable('tab1', [m, dl, k.toFixed(2)]);
+    }
 
-            // Verifică dacă sunt mai mult de 10 rânduri
-            if (tbody.children.length > 10) {
-                tbody.removeChild(tbody.lastChild);
-            }
-        }
-    </script>
+    function calcDL() {
+        let m = document.getElementById('m2').value;
+        let k = document.getElementById('k2').value;
+        if(m <= 0 || k <= 0) return;
+
+        let dlMetri = ( (m/1000) * G ) / k;
+        let dlCm = dlMetri * 100;
+        document.getElementById('resDL').innerText = dlCm.toFixed(2);
+
+        // Animatie resort
+        let visualH = 100 + (dlCm * 2);
+        drawSpring('path2', visualH);
+        document.getElementById('w2').style.top = visualH + "px";
+        document.getElementById('w2').innerText = m + "g";
+
+        updateTable('tab2', [k, m, dlCm.toFixed(2)]);
+    }
+
+    function updateTable(id, data) {
+        let table = document.getElementById(id);
+        let row = table.insertRow(0);
+        data.forEach(text => {
+            let cell = row.insertCell();
+            cell.innerText = text;
+        });
+        if(table.rows.length > 10) table.deleteRow(10);
+    }
+
+    // Initializare
+    drawSpring('path1', 100);
+    drawSpring('path2', 100);
+</script>
+
 </body>
 </html>
+
