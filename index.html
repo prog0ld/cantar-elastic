@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -271,6 +270,7 @@
         </div>
         <div class="spring-area" id="spring-area-1">
             <svg class="spring-svg" id="svg1" width="60" height="100">
+                <line id="connection-w1" x1="30" y1="100" x2="30" y2="100" stroke="#667eea" stroke-width="2" opacity="0.6"/>
                 <path id="path1" d="" />
             </svg>
             <div id="w1" class="weight">m</div>
@@ -288,6 +288,7 @@
         </div>
         <div class="spring-area" id="spring-area-2">
             <svg class="spring-svg" id="svg2" width="60" height="100">
+                <line id="connection-w2" x1="30" y1="100" x2="30" y2="100" stroke="#667eea" stroke-width="2" opacity="0.6"/>
                 <path id="path2" d="" />
             </svg>
             <div id="w2" class="weight">m</div>
@@ -312,7 +313,10 @@
         </table>
     </div>
     <div class="chart-wrapper">
-        <h3 style="margin-top: 0; color: #667eea;">📈 Grafic F vs ΔL</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin: 0; color: #667eea;">📈 Grafic F vs ΔL</h3>
+            <button onclick="resetChart()" style="padding: 6px 12px; font-size: 0.9em; margin-top: 0;">RESET</button>
+        </div>
         <canvas id="chartCanvas"></canvas>
     </div>
 </div>
@@ -330,36 +334,51 @@
     function drawSpring(pathId, height) {
         let h = parseFloat(height);
         if (h > 310) h = 310;
-        const topY = 0;
-        const loops = 8;
-        const loopHeight = (h - 20) / loops;
+        const topY = 10;
+        const loops = Math.max(6, Math.ceil(h / 30));
+        const loopHeight = (h - 30) / loops;
         
-        let d = `M30,${topY} L30,10`;
+        let d = `M30,0 Q25,5 30,10`;
         for (let i = 0; i < loops; i++) {
-            let x = (i % 2 === 0) ? 15 : 45;
-            let y = 10 + (i * loopHeight) + (loopHeight / 2);
-            d += ` L${x},${y}`;
+            let x1 = 15;
+            let x2 = 45;
+            if (i % 2 === 1) [x1, x2] = [x2, x1];
+            
+            let y = topY + (i * loopHeight);
+            let yMid = y + (loopHeight / 2);
+            
+            d += ` Q${x1},${yMid} ${x2},${y + loopHeight}`;
         }
-        d += ` L30,${h-10} L30,${h}`;
+        d += ` Q25,${h-5} 30,${h}`;
         
         const path = document.getElementById(pathId);
         path.setAttribute('d', d);
         path.parentElement.setAttribute('height', h);
     }
 
-    function animateWeight(weightId, startTop, endTop, duration = 800) {
+    function animateWeight(weightId, startTop, endTop, duration = 1000) {
         const weight = document.getElementById(weightId);
         const startTime = Date.now();
+        const connectionLine = document.getElementById('connection-' + weightId);
+        
+        function elasticEasing(t) {
+            // Elastic easing cu bounce
+            const c5 = (2 * Math.PI) / 4.5;
+            return t === 0 ? 0 : t === 1 ? 1 : 
+                Math.pow(2, -10 * t) * Math.sin((t - 0.075) * c5) + 1;
+        }
         
         function animate() {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
-            const easeProgress = progress < 0.5 
-                ? 2 * progress * progress 
-                : -1 + (4 - 2 * progress) * progress;
+            const easeProgress = elasticEasing(progress);
             
             const currentTop = startTop + (endTop - startTop) * easeProgress;
             weight.style.top = currentTop + "px";
+            
+            if (connectionLine) {
+                connectionLine.setAttribute('y2', currentTop);
+            }
             
             if (progress < 1) {
                 requestAnimationFrame(animate);
@@ -383,9 +402,17 @@
         const ctx = document.getElementById('chartCanvas');
         if (!ctx) return;
 
+        const maxX = chartData.extensions.length > 0 ? Math.max(...chartData.extensions) * 1.1 : 10;
+        const maxY = chartData.forces.length > 0 ? Math.max(...chartData.forces) * 1.1 : 5;
+
         if (chart) {
             chart.data.labels = chartData.extensions.map(e => e.toFixed(2));
-            chart.data.datasets[0].data = chartData.forces;
+            chart.data.datasets[0].data = chartData.forces.map((f, i) => ({
+                x: chartData.extensions[i],
+                y: f
+            }));
+            chart.options.scales.x.max = maxX;
+            chart.options.scales.y.max = maxY;
             chart.update();
         } else {
             chart = new Chart(ctx, {
@@ -400,28 +427,34 @@
                         })),
                         borderColor: '#667eea',
                         backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
                         pointBackgroundColor: '#764ba2',
+                        pointBorderColor: '#667eea',
+                        pointBorderWidth: 2,
                         showLine: true,
-                        tension: 0.1
+                        tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
                     plugins: {
-                        legend: { display: true, position: 'top' }
+                        legend: { display: true, position: 'top', labels: { font: { size: 13 }, padding: 15 } }
                     },
                     scales: {
                         x: { 
-                            title: { display: true, text: 'ΔL (cm)' },
-                            min: 0
+                            title: { display: true, text: 'ΔL (cm)', font: { size: 12, weight: 'bold' } },
+                            min: 0,
+                            max: maxX,
+                            grid: { color: 'rgba(102, 126, 234, 0.1)' }
                         },
                         y: { 
-                            title: { display: true, text: 'Forță (N)' },
-                            min: 0
+                            title: { display: true, text: 'Forță (N)', font: { size: 12, weight: 'bold' } },
+                            min: 0,
+                            max: maxY,
+                            grid: { color: 'rgba(102, 126, 234, 0.1)' }
                         }
                     }
                 }
@@ -449,7 +482,7 @@
         // Actualizare grafic
         chartData.extensions.push(dl);
         chartData.forces.push(force);
-        if(chartData.extensions.length > 20) {
+        if(chartData.extensions.length > 15) {
             chartData.extensions.shift();
             chartData.forces.shift();
         }
@@ -478,13 +511,22 @@
 
         chartData.extensions.push(dlCm);
         chartData.forces.push(force);
-        if(chartData.extensions.length > 20) {
+        if(chartData.extensions.length > 15) {
             chartData.extensions.shift();
             chartData.forces.shift();
         }
         updateChart();
 
         addTableRow('tab2', [k.toFixed(2), m, dlCm.toFixed(2)]);
+    }
+
+    function resetChart() {
+        chartData = { forces: [], extensions: [] };
+        if (chart) {
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+            chart.update();
+        }
     }
 
     function addTableRow(id, values) {
