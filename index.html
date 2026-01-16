@@ -34,7 +34,6 @@
             border-bottom: 2px solid #333;
             background: white;
             gap: 0;
-            min-height: 100vh;
             flex: 1;
         }
 
@@ -239,6 +238,15 @@
             margin: 0 0 10px 0;
             font-size: 0.95em;
             color: #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-wrapper h3 button {
+            padding: 4px 10px;
+            font-size: 0.8em;
+            margin: 0;
         }
 
         table {
@@ -352,7 +360,9 @@
         </div>
 
         <div class="chart-wrapper">
-            <h3>📈 Grafic F vs ΔL</h3>
+            <h3>📈 Grafic F vs ΔL
+                <button onclick="resetChart()">RESET</button>
+            </h3>
             <canvas id="chartCanvas"></canvas>
         </div>
     </div>
@@ -618,6 +628,14 @@
         setupDragMode();
         updateChart();
     };
+
+    function resetChart() {
+        chartData = { forces: [], extensions: [] };
+        const tbody = document.getElementById('history-table');
+        tbody.innerHTML = '';
+        history = [];
+        updateChart();
+    }
 </script>
 
 </body>
