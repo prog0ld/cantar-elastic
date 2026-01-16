@@ -3,24 +3,29 @@
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <title>Fizică</title>
+    <title>Fizică - Legea lui Hooke</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * { box-sizing: border-box; }
+        
         body {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background-color: #f4f4f4;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
         header {
-            background: #222;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: #ffffff; 
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            border-bottom: 2px solid #444;
+            border-bottom: 3px solid #667eea;
             font-weight: bold;
+            font-size: 1.4em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
         .simulation-container {
@@ -28,82 +33,174 @@
             flex-direction: row;
             border-bottom: 2px solid #333;
             background: white;
+            gap: 0;
         }
 
         .column {
             flex: 1;
-            padding: 20px;
-            border-right: 1px solid #ccc;
+            padding: 25px;
+            border-right: 1px solid #e0e0e0;
             display: flex;
             flex-direction: column;
+            background: linear-gradient(to right, #fafafa, #ffffff);
+            transition: background 0.3s ease;
+        }
+
+        .column:hover {
+            background: linear-gradient(to right, #f5f5f5, #ffffff);
         }
 
         .column:last-child { border-right: none; }
 
         .panel {
-            border: 1px solid #000;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #fafafa;
+            border: 2px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
         }
 
-        h2 { font-size: 1.1em; margin-top: 0; background: #eee; padding: 5px; }
+        h2 { 
+            font-size: 1.1em; 
+            margin: 0 0 10px 0; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 8px 12px; 
+            color: white;
+            border-radius: 5px;
+        }
 
-        input { width: 70px; margin: 5px; font-family: inherit; }
+        input { 
+            width: 80px; 
+            margin: 5px 5px 5px 0;
+            padding: 8px;
+            font-family: inherit;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
 
         button {
             cursor: pointer;
-            background: #444;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 1px solid #000;
-            padding: 5px 10px;
+            border: none;
+            padding: 8px 16px;
             font-family: inherit;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
         }
 
         /* Zona resort */
         .spring-area {
-            height: 300px;
+            height: 350px;
             position: relative;
-            background: #fff;
-            border: 1px inset #eee;
+            background: linear-gradient(to bottom, #f0f4ff, #ffffff);
+            border: 2px solid #ddd;
+            border-radius: 8px;
             overflow: hidden;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            padding-top: 20px;
+            cursor: grab;
+            transition: background 0.3s ease;
+        }
+
+        .spring-area:active {
+            cursor: grabbing;
+            background: linear-gradient(to bottom, #e8eeff, #f5f5ff);
         }
 
         .spring-svg {
-            stroke: #333;
-            stroke-width: 2;
+            stroke: #667eea;
+            stroke-width: 3;
             fill: none;
+            filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2));
         }
 
         .weight {
             width: 50px;
             height: 40px;
-            border: 2px solid #000;
-            background: #888;
+            border: 3px solid #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             position: absolute;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 11px;
+            font-weight: bold;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: box-shadow 0.2s;
         }
 
-        /* Sectiuna de tabel */
+        .weight:hover {
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .force-display {
+            position: absolute;
+            font-size: 12px;
+            color: #667eea;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .force-arrow {
+            position: absolute;
+            width: 2px;
+            background: #f44336;
+            opacity: 0.7;
+        }
+
+        /* Sectiuna de tabel si grafic */
         .results-container {
             display: flex;
             flex-direction: row;
             padding: 20px;
             gap: 20px;
-            background: #eee;
+            background: white;
+            flex-wrap: wrap;
         }
+
 
         .table-wrapper {
             flex: 1;
             background: white;
-            padding: 10px;
-            border: 1px solid #333;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+            min-width: 300px;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+            min-width: 350px;
+            position: relative;
         }
 
         table {
@@ -112,15 +209,48 @@
             font-size: 0.85em;
         }
 
-        th, td { border: 1px solid #000; padding: 4px; text-align: center; }
-        th { background: #ddd; }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            text-align: center; 
+        }
+        
+        th { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #f5f5ff;
+        }
 
         footer {
             text-align: center;
-            padding: 10px;
-            background: #222;
-            color: #777;
+            padding: 15px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #aaa;
             margin-top: auto;
+            border-top: 3px solid #667eea;
+        }
+
+        .info-text {
+            color: #667eea;
+            font-size: 0.95em;
+            margin: 8px 0;
+        }
+
+        .info-text b {
+            color: #764ba2;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        tr {
+            animation: slideIn 0.3s ease;
         }
     </style>
 </head>
@@ -131,53 +261,59 @@
 </header>
 
 <div class="simulation-container">
-    <div class="column">
+<div class="column">
         <div class="panel">
-            <h2>Calcul constantă k</h2>
-            Masa(g): <input type="number" id="m1" value="200"> 
-            &Delta;l(cm): <input type="number" id="dl1" value="10">
+            <h2>📐 Calcul constantă k</h2>
+            <label>Masa(g): <input type="number" id="m1" value="200"></label>
+            <label>ΔL(cm): <input type="number" id="dl1" value="10"></label>
             <button onclick="runMod1()">CALCULEAZĂ</button>
-            <p>Rezultat: <b>k = <span id="outK">?</span> N/m</b></p>
+            <p class="info-text">Rezultat: <b>k = <span id="outK">?</span> N/m</b></p>
         </div>
-        <div class="spring-area">
+        <div class="spring-area" id="spring-area-1">
             <svg class="spring-svg" id="svg1" width="60" height="100">
                 <path id="path1" d="" />
             </svg>
             <div id="w1" class="weight">m</div>
+            <div class="force-display" id="force-text-1"></div>
         </div>
     </div>
 
     <div class="column">
         <div class="panel">
-            <h2>Calcul alungire &Delta;l;</h2>
-            k(N/m): <input type="number" id="k2" value="50"> 
-            Masa(g): <input type="number" id="m2" value="300">
+            <h2>🔄 Calcul alungire ΔL</h2>
+            <label>k(N/m): <input type="number" id="k2" value="50"></label>
+            <label>Masa(g): <input type="number" id="m2" value="300"></label>
             <button onclick="runMod2()">SIMULEAZĂ</button>
-            <p>Rezultat: <b>&Delta;l = <span id="outDL">?</span> cm</b></p>
+            <p class="info-text">Rezultat: <b>ΔL = <span id="outDL">?</span> cm</b></p>
         </div>
-        <div class="spring-area">
+        <div class="spring-area" id="spring-area-2">
             <svg class="spring-svg" id="svg2" width="60" height="100">
                 <path id="path2" d="" />
             </svg>
             <div id="w2" class="weight">m</div>
+            <div class="force-display" id="force-text-2"></div>
         </div>
     </div>
 </div>
 
 <div class="results-container">
     <div class="table-wrapper">
-        <caption>Istoric 1</caption>
+        <h3 style="margin-top: 0; color: #667eea;">📊 Istoric Mod 1</h3>
         <table>
-            <thead><tr><th>m (g)</th><th>&Delta;l (cm)</th><th>k (N/m)</th></tr></thead>
+            <thead><tr><th>m (g)</th><th>ΔL (cm)</th><th>k (N/m)</th></tr></thead>
             <tbody id="tab1"></tbody>
         </table>
     </div>
     <div class="table-wrapper">
-        <caption>Istoric 2</caption>
+        <h3 style="margin-top: 0; color: #667eea;">📊 Istoric Mod 2</h3>
         <table>
-            <thead><tr><th>k (N/m)</th><th>m (g)</th><th>&Delta;l (cm)</th></tr></thead>
+            <thead><tr><th>k (N/m)</th><th>m (g)</th><th>ΔL (cm)</th></tr></thead>
             <tbody id="tab2"></tbody>
         </table>
+    </div>
+    <div class="chart-wrapper">
+        <h3 style="margin-top: 0; color: #667eea;">📈 Grafic F vs ΔL</h3>
+        <canvas id="chartCanvas"></canvas>
     </div>
 </div>
 
@@ -187,11 +323,13 @@
 
 <script>
     const g = 9.81;
+    let chartData = { forces: [], extensions: [] };
+    let chart = null;
+    let dragging = null;
 
- 
     function drawSpring(pathId, height) {
         let h = parseFloat(height);
-        if (h > 280) h = 280; // limita vizuala sa nu iasa din cutie
+        if (h > 310) h = 310;
         const topY = 0;
         const loops = 8;
         const loopHeight = (h - 20) / loops;
@@ -209,50 +347,214 @@
         path.parentElement.setAttribute('height', h);
     }
 
+    function animateWeight(weightId, startTop, endTop, duration = 800) {
+        const weight = document.getElementById(weightId);
+        const startTime = Date.now();
+        
+        function animate() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const easeProgress = progress < 0.5 
+                ? 2 * progress * progress 
+                : -1 + (4 - 2 * progress) * progress;
+            
+            const currentTop = startTop + (endTop - startTop) * easeProgress;
+            weight.style.top = currentTop + "px";
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        }
+        animate();
+    }
+
+    function updateForceDisplay(mode, force, dlCm) {
+        const forceId = mode === 1 ? 'force-text-1' : 'force-text-2';
+        const display = document.getElementById(forceId);
+        const weight = document.getElementById(mode === 1 ? 'w1' : 'w2');
+        
+        const topPos = parseFloat(weight.style.top) || (80 + dlCm * 3);
+        display.style.top = (topPos - 25) + "px";
+        display.style.left = "5px";
+        display.innerHTML = `<small>F=${force.toFixed(1)}N</small>`;
+    }
+
+    function updateChart() {
+        const ctx = document.getElementById('chartCanvas');
+        if (!ctx) return;
+
+        if (chart) {
+            chart.data.labels = chartData.extensions.map(e => e.toFixed(2));
+            chart.data.datasets[0].data = chartData.forces;
+            chart.update();
+        } else {
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    labels: chartData.extensions.map(e => e.toFixed(2)),
+                    datasets: [{
+                        label: 'Forță vs Extensie',
+                        data: chartData.forces.map((f, i) => ({
+                            x: chartData.extensions[i],
+                            y: f
+                        })),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#764ba2',
+                        showLine: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: true, position: 'top' }
+                    },
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'ΔL (cm)' },
+                            min: 0
+                        },
+                        y: { 
+                            title: { display: true, text: 'Forță (N)' },
+                            min: 0
+                        }
+                    }
+                }
+            });
+        }
+    }
+
     function runMod1() {
-        let m = document.getElementById('m1').value;
-        let dl = document.getElementById('dl1').value;
+        let m = parseFloat(document.getElementById('m1').value);
+        let dl = parseFloat(document.getElementById('dl1').value);
         if(m <= 0 || dl <= 0) return;
 
-        let k = ( (m/1000) * g ) / (dl/100);
+        const force = (m/1000) * g;
+        let k = force / (dl/100);
         document.getElementById('outK').innerText = k.toFixed(2);
         
         let vHeight = 80 + (dl * 3); 
+        const oldHeight = parseFloat(document.getElementById('svg1').getAttribute('height')) || 80;
+        
         drawSpring('path1', vHeight);
-        document.getElementById('w1').style.top = vHeight + "px";
+        animateWeight('w1', oldHeight, vHeight);
         document.getElementById('w1').innerText = m + "g";
+        updateForceDisplay(1, force, dl);
 
-        addTableRow('tab1', [m, dl, k.toFixed(2)]);
+        // Actualizare grafic
+        chartData.extensions.push(dl);
+        chartData.forces.push(force);
+        if(chartData.extensions.length > 20) {
+            chartData.extensions.shift();
+            chartData.forces.shift();
+        }
+        updateChart();
+
+        addTableRow('tab1', [m, dl.toFixed(2), k.toFixed(2)]);
     }
 
     function runMod2() {
-        let k = document.getElementById('k2').value;
-        let m = document.getElementById('m2').value;
+        let k = parseFloat(document.getElementById('k2').value);
+        let m = parseFloat(document.getElementById('m2').value);
         if(k <= 0 || m <= 0) return;
 
-        let dlM = ( (m/1000) * g ) / k;
+        const force = (m/1000) * g;
+        let dlM = force / k;
         let dlCm = dlM * 100;
         document.getElementById('outDL').innerText = dlCm.toFixed(2);
 
         let vHeight = 80 + (dlCm * 3);
+        const oldHeight = parseFloat(document.getElementById('svg2').getAttribute('height')) || 80;
+        
         drawSpring('path2', vHeight);
-        document.getElementById('w2').style.top = vHeight + "px";
+        animateWeight('w2', oldHeight, vHeight);
         document.getElementById('w2').innerText = m + "g";
+        updateForceDisplay(2, force, dlCm);
 
-        addTableRow('tab2', [k, m, dlCm.toFixed(2)]);
+        chartData.extensions.push(dlCm);
+        chartData.forces.push(force);
+        if(chartData.extensions.length > 20) {
+            chartData.extensions.shift();
+            chartData.forces.shift();
+        }
+        updateChart();
+
+        addTableRow('tab2', [k.toFixed(2), m, dlCm.toFixed(2)]);
     }
 
     function addTableRow(id, values) {
         let tbody = document.getElementById(id);
         let row = tbody.insertRow(0);
-        values.forEach(v => row.insertCell().innerText = v);
+        values.forEach(v => {
+            const cell = row.insertCell();
+            cell.innerText = v;
+        });
         if(tbody.rows.length > 10) tbody.deleteRow(10);
     }
 
-    // Init la incarcare
+    // Drag n drop (cv de genu)
+    function setupDragMode(areaId, mode) {
+        const area = document.getElementById(areaId);
+        const weight = document.getElementById(mode === 1 ? 'w1' : 'w2');
+        const pathId = mode === 1 ? 'path1' : 'path2';
+
+        area.addEventListener('mousedown', (e) => {
+            if (e.target === weight || weight.contains(e.target)) {
+                dragging = { mode, startY: e.clientY, startTop: parseFloat(weight.style.top) || 80 };
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!dragging || dragging.mode !== mode) return;
+
+            let newTop = dragging.startTop + (e.clientY - dragging.startY);
+            if (newTop < 80) newTop = 80;
+            if (newTop > 350) newTop = 350;
+
+            weight.style.top = newTop + "px";
+            
+            // Calcul alungire
+            const dlCm = (newTop - 80) / 3;
+            
+            let vHeight = 80 + dlCm * 3;
+            drawSpring(pathId, vHeight);
+
+            // actualizare in timp real (cred)
+            if (mode === 1) {
+                let m = parseFloat(document.getElementById('m1').value) || 200;
+                const force = (m/1000) * g;
+                let k = force / (dlCm/100);
+                document.getElementById('outDL').innerText = dlCm.toFixed(2);
+                document.getElementById('outK').innerText = k.toFixed(2);
+                updateForceDisplay(1, force, dlCm);
+            } else {
+                let k = parseFloat(document.getElementById('k2').value) || 50;
+                document.getElementById('m2').value = ((k * dlCm / 100 / g) * 1000).toFixed(0);
+                const m = parseFloat(document.getElementById('m2').value);
+                const force = (m/1000) * g;
+                updateForceDisplay(2, force, dlCm);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (dragging && dragging.mode === mode) {
+                dragging = null;
+            }
+        });
+    }
+
+    // Init
     window.onload = () => {
         drawSpring('path1', 80);
         drawSpring('path2', 80);
+        setupDragMode('spring-area-1', 1);
+        setupDragMode('spring-area-2', 2);
+        updateChart();
     };
 </script>
 
